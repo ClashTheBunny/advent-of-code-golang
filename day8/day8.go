@@ -9,8 +9,41 @@ import (
 	"strings"
 )
 
+func min(theArray []uint8) uint8 {
+	min := uint8(128)
+	for _, item := range theArray {
+		if item < min {
+			min = item
+		}
+	}
+	return min
+}
+
+func digitToBitDigit(digit string) uint8 {
+	bitDigit := uint8(0b0)
+	for _, char := range digit {
+		switch char {
+		case 'a':
+			bitDigit = bitDigit | 0b1000000
+		case 'b':
+			bitDigit = bitDigit | 0b100000
+		case 'c':
+			bitDigit = bitDigit | 0b10000
+		case 'd':
+			bitDigit = bitDigit | 0b1000
+		case 'e':
+			bitDigit = bitDigit | 0b100
+		case 'f':
+			bitDigit = bitDigit | 0b10
+		case 'g':
+			bitDigit = bitDigit | 0b1
+		}
+	}
+	return bitDigit
+}
+
 func main() {
-	data, err := os.ReadFile("day8.txt")
+	data, err := os.ReadFile("day8_test.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,127 +61,62 @@ func main() {
 		outs[in_out] = strings.TrimSpace(this_in_out[1])
 
 		split_ins := strings.Split(ins[in_out], " ")
-		zero := uint8(0b0)
-		one := uint8(0b0)
-		two := uint8(0b0)
-		three := uint8(0b0)
-		four := uint8(0b0)
-		five := uint8(0b0)
-		six := uint8(0b0)
-		seven := uint8(0b0)
-		eight := uint8(0b0)
-		nine := uint8(0b0)
-		// for digitIndex, digit := range split_ins {
-		i := 0
-		for i < 10 {
+
+		digits := make([]uint8, 10)
+		for min(digits) == 0 {
 			for _, digit := range split_ins {
-				bitDigit := uint8(0b0)
-				for _, char := range digit {
-					switch char {
-					case 'a':
-						bitDigit = bitDigit | 0b1000000
-					case 'b':
-						bitDigit = bitDigit | 0b100000
-					case 'c':
-						bitDigit = bitDigit | 0b10000
-					case 'd':
-						bitDigit = bitDigit | 0b1000
-					case 'e':
-						bitDigit = bitDigit | 0b100
-					case 'f':
-						bitDigit = bitDigit | 0b10
-					case 'g':
-						bitDigit = bitDigit | 0b1
-					}
-				}
+				bitDigit := digitToBitDigit(digit)
 				switch bits.OnesCount8(bitDigit) {
 				case 2: // It's a one
-					one = bitDigit
+					digits[1] = bitDigit
 				case 3: // It's a seven
-					seven = bitDigit
+					digits[7] = bitDigit
 				case 4: // It's a four
-					four = bitDigit
+					digits[4] = bitDigit
 				case 7: // It's an 8
-					eight = bitDigit
-				case 6: // It's an 8
-					if (one > 0) && (bitDigit&one != one) {
-						six = bitDigit
-					} else if (four > 0 && one > 0) && (bitDigit&one == one) && (bitDigit&four == four) {
-						nine = bitDigit
-					} else if (four > 0 && one > 0) && (bitDigit&one == one) && (bitDigit&four != four) {
-						zero = bitDigit
+					digits[8] = bitDigit
+				case 6:
+					if (digits[1] > 0) && (bitDigit&digits[1] != digits[1]) {
+						digits[6] = bitDigit
+					} else if (digits[4] > 0 && digits[1] > 0) && (bitDigit&digits[1] == digits[1]) && (bitDigit&digits[4] == digits[4]) {
+						digits[9] = bitDigit
+					} else if (digits[4] > 0 && digits[1] > 0) && (bitDigit&digits[1] == digits[1]) && (bitDigit&digits[4] != digits[4]) {
+						digits[0] = bitDigit
 					} else {
 					}
-				case 5: // It's an 8
-					if (seven > 0) && (bitDigit&seven == seven) {
-						three = bitDigit
-					} else if (six > 0 && three > 0) && bits.OnesCount8(bitDigit&six) == 5 {
-						five = bitDigit
-					} else if (six > 0 && three > 0) && bits.OnesCount8(bitDigit&six) == 4 {
-						two = bitDigit
+				case 5:
+					if (digits[7] > 0) && (bitDigit&digits[7] == digits[7]) {
+						digits[3] = bitDigit
+					} else if (digits[6] > 0 && digits[3] > 0) && bits.OnesCount8(bitDigit&digits[6]) == 5 {
+						digits[5] = bitDigit
+					} else if (digits[6] > 0 && digits[3] > 0) && bits.OnesCount8(bitDigit&digits[6]) == 4 {
+						digits[2] = bitDigit
 					} else {
 						// fmt.Printf("not found (%d): %08b\n", i, bitDigit)
-						// fmt.Printf("%08b %08b %08b %08b %08b %08b %08b %08b %08b %08b\n", zero, one, two, three, four, five, six, seven, eight, nine)
+						// fmt.Printf("%08b\n", digits)
 					}
 				default:
-					fmt.Println("woops")
+					log.Fatal("woops")
 				}
 			}
-			i++
 		}
-		fmt.Printf("%08b %08b %08b %08b %08b %08b %08b %08b %08b %08b\n", zero, one, two, three, four, five, six, seven, eight, nine)
+		digitMap := make(map[uint8]int)
+		for i, digit := range digits {
+			digitMap[digit] = i
+		}
+		// fmt.Printf("%08b\n", digits)
 		split_outs := strings.Split(outs[in_out], " ")
 		total := 0
 		for i, digit := range split_outs {
-			bitDigit := uint8(0b0)
-			for _, char := range digit {
-				switch char {
-				case 'a':
-					bitDigit = bitDigit | 0b1000000
-				case 'b':
-					bitDigit = bitDigit | 0b100000
-				case 'c':
-					bitDigit = bitDigit | 0b10000
-				case 'd':
-					bitDigit = bitDigit | 0b1000
-				case 'e':
-					bitDigit = bitDigit | 0b100
-				case 'f':
-					bitDigit = bitDigit | 0b10
-				case 'g':
-					bitDigit = bitDigit | 0b1
-				}
-			}
+			bitDigit := digitToBitDigit(digit)
 			multiplier := int(math.Pow(10, float64(3-i)))
-			switch bitDigit {
-			case zero:
-			case one:
-				total += 1 * multiplier
+			total += multiplier * digitMap[bitDigit]
+			switch digitMap[bitDigit] {
+			case 1, 4, 7, 8:
 				unique += 1
-			case two:
-				total += 2 * multiplier
-			case three:
-				total += 3 * multiplier
-			case four:
-				total += 4 * multiplier
-				unique += 1
-			case five:
-				total += 5 * multiplier
-			case six:
-				total += 6 * multiplier
-			case seven:
-				total += 7 * multiplier
-				unique += 1
-			case eight:
-				total += 8 * multiplier
-				unique += 1
-			case nine:
-				total += 9 * multiplier
-			default:
-				fmt.Println("not fount(", i, "): ", bitDigit, one, one == bitDigit)
 			}
 		}
-		fmt.Println(this_in_out, total)
+		// fmt.Println(this_in_out, total)
 		grandTotal += total
 	}
 
