@@ -5,8 +5,6 @@ import (
 	"log"
 	"os"
 	"strings"
-
-	"github.com/kr/pretty"
 )
 
 type Point struct {
@@ -45,9 +43,10 @@ func main() {
 		}
 	}
 
-	fmt.Println(squiddict)
 	flashes := 0
-	for day := 1; day <= days; day++ {
+	day := 0
+	for true {
+		day++
 		for _, squid := range squiddict {
 			squid[0]++
 		}
@@ -63,21 +62,17 @@ func main() {
 				}
 			}
 		}
-		fmt.Println(day)
-		fmt.Printf("%# v \n", pretty.Formatter(squiddict))
-		fmt.Println(flashes)
-		for k, _ := range squiddict {
-			if squiddict[k][0] > 9 {
-				squiddict[k][0] = 0
-			}
-			if squiddict[k][1] == 2 {
-				squiddict[k][1] = 0
-			}
+		if day == days {
+			fmt.Println("Flashes on day 100: ", flashes)
 		}
-	}
-	if flashes == 1656 {
-		os.Exit(0)
-	} else {
-		os.Exit(1)
+		sum := int64(0)
+		for _, squid := range squiddict {
+			sum += int64(squid[0])
+		}
+		if sum == 0 {
+			fmt.Println("First all zero day: ", day)
+			break
+		}
+
 	}
 }
