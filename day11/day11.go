@@ -14,19 +14,17 @@ type Point struct {
 	j int
 }
 
-func increaseSquid(squiddict map[Point][]int, point Point) int {
-	energy := 0
+func increaseSquid(squiddict map[Point][]int, point Point) {
 	var tmp []int
 	var found bool
 	for di := -1; di <= 1; di++ {
 		for dj := -1; dj <= 1; dj++ {
 			tmp, found = squiddict[Point{point.i + di, point.j + dj}]
-			if found && tmp[0] > 9 && tmp[1] == 1 {
-				energy += 1
+			if found && tmp[0] <= 9 && tmp[0] > 0 {
+				tmp[0] += 1
 			}
 		}
 	}
-	return energy
 }
 
 func main() {
@@ -34,7 +32,7 @@ func main() {
 	// to high: 1662
 	// to high: 1624
 
-	data, err := os.ReadFile("day11_test.txt")
+	data, err := os.ReadFile("day11.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -52,29 +50,16 @@ func main() {
 	for day := 1; day <= days; day++ {
 		for _, squid := range squiddict {
 			squid[0]++
-			if squid[0] > 9 {
-				squid[1] = 1
-			}
 		}
-		changed := true
-		for changed {
-			changed = false
+		flashed := true
+		for flashed {
+			flashed = false
 			for k, _ := range squiddict {
-				if squiddict[k][1] == 0 {
-					increase := increaseSquid(squiddict, k)
-					if increase > 0 {
-						squiddict[k][0] += increase
-						if squiddict[k][0] > 9 {
-							squiddict[k][1] = 1
-						}
-						changed = true
-					}
-				}
-			}
-			for k, _ := range squiddict {
-				if squiddict[k][1] == 1 {
-					squiddict[k][1] = 2
-					flashes += 1
+				if squiddict[k][0] > 9 {
+					increaseSquid(squiddict, k)
+					squiddict[k][0] = 0
+					flashed = true
+					flashes++
 				}
 			}
 		}
@@ -95,38 +80,4 @@ func main() {
 	} else {
 		os.Exit(1)
 	}
-	fmt.Println(flashes == 1656)
-	// var basins []int64
-	// for i, squids := range squidmap {
-	// 	next_row := max_row
-	// 	if i+1 < len(squidmap) {
-	// 		next_row = squidmap[i+1]
-	// 	}
-	// 	last_row := max_row
-	// 	if i-1 >= 0 {
-	// 		last_row = squidmap[i-1]
-	// 	}
-	// 	for j, squid := range squids {
-	// 		next_col := int64(10)
-	// 		if j+1 < len(squids) {
-	// 			next_col = squids[j+1]
-	// 		}
-	// 		last_col := int64(10)
-	// 		if j-1 >= 0 {
-	// 			last_col = squids[j-1]
-	// 		}
-	// 		if next_row[j] > squid && last_row[j] > squid && next_col > squid && last_col > squid {
-	// 			risk += 1 + squidmap[i][j]
-	// 			sizeOfBasin := int64(0)
-	// 			sizeOfBasin, done = findBasin(squidmap, Point{i, j}, done)
-	// 			basins = append(basins, sizeOfBasin)
-	// 		}
-	// 	}
-	// }
-	// sort.Slice(basins, func(i, j int) bool { return basins[i] < basins[j] })
-	// part2 := int64(1)
-	// for _, basin := range basins[len(basins)-3:] {
-	// 	part2 *= basin
-	// }
-	// fmt.Println(risk, part2)
 }
