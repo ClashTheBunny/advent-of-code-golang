@@ -61,8 +61,9 @@ func main() {
 	min_freq := MaxInt
 	max := "A"
 	min := "B"
+	_ = min
+	_ = max
 	for letter, freq := range freq_count {
-		fmt.Println(max, max_freq, min, min_freq)
 		switch true {
 		case freq > max_freq:
 			max = letter
