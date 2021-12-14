@@ -27,8 +27,8 @@ func main() {
 	}
 
 	folds_and_dots := strings.Split(strings.TrimSpace(string(data)), "\n\n")
+
 	dots := make(map[[2]int64]bool, 0)
-	folds := make([][]int64, 0)
 	for _, dot := range strings.Split(folds_and_dots[0], "\n") {
 		tmp := strings.Split(dot, ",")
 		x_cord, err := strconv.ParseInt(tmp[0], 0, 64)
@@ -41,6 +41,8 @@ func main() {
 		}
 		dots[[2]int64{x_cord, y_cord}] = true
 	}
+
+	folds := make([][]int64, 0)
 	for _, fold := range strings.Split(folds_and_dots[1], "\n") {
 		tmp := strings.Split(fold, "=")
 		direction := int64(strings.Split(tmp[0], " ")[2][0]) - 'x'
