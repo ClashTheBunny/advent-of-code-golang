@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	dijkstra "github.com/RyanCarrier/dijkstra"
 )
 
 type Point struct {
@@ -12,145 +14,116 @@ type Point struct {
 	j int
 }
 
+func nodeID(x, y, row_len int) int {
+	return x + row_len*y
+}
+
+func createMapPart1(data []byte) (*dijkstra.Graph, int, int, int) {
+	graph := dijkstra.NewGraph()
+
+	squidmap_1 := strings.Split(strings.TrimSpace(string(data)), "\n")
+	squiddict := make(map[Point][]int, 0)
+	row_len := len(squidmap_1[0])
+
+	for j, squids := range squidmap_1 {
+		for i, squidvalue := range squids {
+			thisnodeID := nodeID(i, j, row_len)
+			graph.AddVertex(thisnodeID)
+			squiddict[Point{i, j}] = []int{int(squidvalue - '0'), 0}
+			// fmt.Printf("%d", squiddict[Point{i, j}])
+		}
+	}
+	_ = graph
+	for j, squids := range squidmap_1 {
+		for i := range squids {
+			thisnodeID := nodeID(i, j, row_len)
+			for dx := -1; dx <= 1; dx++ {
+				for dy := -1; dy <= 1; dy++ {
+					if i+dx >= 0 && i+dx < len(squids) {
+						if j+dy >= 0 && j+dy < len(squids) {
+							if (dx == 0 || dy == 0) && dx != dy {
+								otherID := nodeID(i+dx, j+dy, row_len)
+								// println(i, j, dx, dy, thisnodeID, otherID, int64(squiddict[Point{i + dx, j + dy}][0]))
+								graph.AddArc(thisnodeID, otherID, int64(squiddict[Point{i + dx, j + dy}][0]))
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return graph, len(squidmap_1[0]) - 1, len(squidmap_1) - 1, len(squidmap_1[0])
+}
+
+func createMapPart2(data []byte) (*dijkstra.Graph, int, int, int) {
+	graph := dijkstra.NewGraph()
+
+	squidmap_1 := strings.Split(strings.TrimSpace(string(data)), "\n")
+	squiddict := make(map[Point]int64, 0)
+	mult := 5
+	orig_xmax, orig_ymax, orig_row_len := len(squidmap_1[0])-1, len(squidmap_1)-1, len(squidmap_1[0])
+	xmax, ymax, row_len := len(squidmap_1[0])*mult-1, len(squidmap_1)*mult-1, len(squidmap_1[0])*mult
+	_, _ = orig_xmax, orig_ymax
+
+	for j := 0; j <= ymax; j++ {
+		for i := 0; i <= xmax; i++ {
+			thisnodeID := nodeID(i, j, row_len)
+			graph.AddVertex(thisnodeID)
+			xmult := int64(i / orig_row_len)
+			ymult := int64(j / orig_row_len)
+			cost := (int64(squidmap_1[j%orig_row_len][i%orig_row_len]-'0') + xmult + ymult) % 9
+			// fmt.Println(thisnodeID, i, j)
+			// fmt.Println(xmult, ymult, i%orig_row_len, j%orig_row_len, cost)
+			if cost == 0 {
+				cost = 9
+			}
+			squiddict[Point{i, j}] = cost
+		}
+	}
+	// fmt.Println(squiddict)
+	for j := 0; j <= ymax; j++ {
+		for i := 0; i <= xmax; i++ {
+			thisnodeID := nodeID(i, j, row_len)
+			for dx := -1; dx <= 1; dx++ {
+				for dy := -1; dy <= 1; dy++ {
+					if (i+dx >= 0) && (i+dx < row_len) {
+						if (j+dy >= 0) && (j+dy < row_len) {
+							if (dx == 0 || dy == 0) && dx != dy {
+								otherID := nodeID(i+dx, j+dy, row_len)
+								cost, found := squiddict[Point{i + dx, j + dy}]
+								// println(i, j, dx, dy, row_len, thisnodeID, otherID, cost)
+								if !found {
+									log.Fatal("cost not found")
+								}
+								graph.AddArc(thisnodeID, otherID, cost)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return graph, xmax, ymax, row_len
+}
+
 func main() {
-	// data, err := os.ReadFile("day15.txt")
+	// data, err := os.ReadFile("day15_ex1.txt")
 	data, err := os.ReadFile("day15.txt")
-	// 533 too high
-	// 529 too high
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	squidmap_1 := strings.Split(strings.TrimSpace(string(data)), "\n")
-	squiddict := make(map[Point][]int, 0)
-	for j, squids := range squidmap_1 {
-		for i, squidvalue := range squids {
-			squiddict[Point{i, j}] = []int{int(squidvalue - '0'), 0}
-			if i == len(squids)-1 {
-				_, found := squiddict[Point{i + 1, j}]
-				squiddict[Point{i + 1, j}] = []int{99, 99999}
-				if found {
-					log.Fatal("Trying to overwrite squid")
-				}
-			}
-			if i == 0 {
-				_, found := squiddict[Point{i - 1, j}]
-				squiddict[Point{i - 1, j}] = []int{99, 99999}
-				if found {
-					log.Fatal("Trying to overwrite squid")
-				}
-			}
-			fmt.Printf("%d", squiddict[Point{i, j}])
-		}
-		if j == len(squidmap_1)-1 {
-			j++
-			for i, _ := range squids {
-				_, found := squiddict[Point{i, j}]
-				squiddict[Point{i, j}] = []int{99, 99999}
-				if found {
-					log.Fatal("Trying to overwrite squid")
-				}
-				if i == len(squids)-1 {
-					_, found = squiddict[Point{i + 1, j}]
-					squiddict[Point{i + 1, j}] = []int{99, 99999}
-					if found {
-						log.Fatal("Trying to overwrite squid")
-					}
-				}
-				if i == 0 {
-					_, found := squiddict[Point{i - 1, j}]
-					squiddict[Point{i - 1, j}] = []int{99, 99999}
-					if found {
-						log.Fatal("Trying to overwrite squid")
-					}
-				}
-			}
-		}
-		if j == 0 {
-			j--
-			for i, _ := range squids {
-				_, found := squiddict[Point{i, j}]
-				squiddict[Point{i, j}] = []int{99, 99999}
-				if found {
-					log.Fatal("Trying to overwrite squid")
-				}
-				if i == len(squids)-1 {
-					_, found = squiddict[Point{i + 1, j}]
-					squiddict[Point{i + 1, j}] = []int{99, 99999}
-					if found {
-						log.Fatal("Trying to overwrite squid")
-					}
-				}
-				if i == 0 {
-					_, found := squiddict[Point{i - 1, j}]
-					squiddict[Point{i - 1, j}] = []int{99, 99999}
-					if found {
-						log.Fatal("Trying to overwrite squid")
-					}
-				}
-			}
-		}
+	graph, maxx, maxy, row_len := createMapPart1(data)
+	best, err := graph.Shortest(0, nodeID(maxx, maxy, row_len))
+	if err != nil {
+		log.Fatal(err)
 	}
+	fmt.Println("Part 1 shortest distance ", best.Distance, " following path ", best.Path)
+	graph, maxx, maxy, row_len = createMapPart2(data)
 
-	start := Point{0, 0}
-	end := Point{len(squidmap_1) - 1, len(squidmap_1[0]) - 1}
-
-	for j := len(squidmap_1) - 1; j >= 0; j-- {
-		for i := len(squidmap_1[0]) - 1; i >= 0; i-- {
-			point := Point{i, j}
-			// if point == end {
-			// 	fmt.Printf("%d", squiddict[point])
-			// 	continue
-			// }
-			if point == start {
-				fmt.Printf("%d", squiddict[point])
-				break
-			}
-			cost := min(squiddict[Point{i + 1, j}], squiddict[Point{i, j + 1}])
-			squiddict[point][1] = cost[0] + squiddict[point][0]
-			fmt.Printf("%d", squiddict[point])
-		}
-		fmt.Printf("\n")
+	best, err = graph.Shortest(0, nodeID(maxx, maxy, row_len))
+	if err != nil {
+		log.Fatal(err)
 	}
-	totalCost := 0
-outerLoop:
-	for i := 0; i < len(squidmap_1); {
-		for j := 0; j < len(squidmap_1[0]); {
-			point := Point{i, j}
-			if point != start {
-				totalCost += squiddict[point][0]
-			}
-			if point == end {
-				break outerLoop
-			}
-			pointx := Point{i + 1, j}
-			pointy := Point{i, j + 1}
-			fmt.Printf("%d: %d", point, squiddict[point])
-			squidx, foundx := squiddict[pointx]
-			squidy, foundy := squiddict[pointy]
-			if !foundx && !foundy {
-				break outerLoop
-			}
-			if !foundx {
-				j++
-			}
-			if !foundy {
-				i++
-			}
-			if squidx[1] > squidy[1] {
-				j++
-			} else {
-				i++
-			}
-		}
-	}
-	fmt.Println("exampleAnswer:", 40, totalCost)
-}
-
-func min(x, y []int) []int {
-	if x[1] < y[1] {
-		return x
-	} else {
-		return y
-	}
+	fmt.Println("Part 2 shortest distance ", best.Distance, " following path ", best.Path)
 }
