@@ -27,8 +27,8 @@ func increaseSquid(squiddict map[Point][]int, point Point) {
 
 func main() {
 	days := 100
-	// to high: 1662
-	// to high: 1624
+	// too high: 1662
+	// too high: 1624
 
 	data, err := os.ReadFile("day11.txt")
 	if err != nil {
