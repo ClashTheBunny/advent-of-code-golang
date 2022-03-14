@@ -1,1 +1,2 @@
-../Makefile
+run:
+	go run day*.go
