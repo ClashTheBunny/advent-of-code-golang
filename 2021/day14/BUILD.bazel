@@ -6,6 +6,8 @@ go_library(
     importpath = "github.com/clashthebunny/advent-of-code-golang/2021/day14",
     visibility = ["//visibility:private"],
     deps = ["@com_github_docopt_docopt_go//:go_default_library"],
+    data = ["day14_ex1.txt",
+            "day14.txt"]
 )
 
 go_binary(

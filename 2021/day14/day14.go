@@ -60,7 +60,8 @@ Options:
 		days_to_print = append(days_to_print, day_int)
 	}
 
-	data, err := os.ReadFile("day14_ex1.txt")
+	data, err := os.ReadFile("2021/day14/day14.txt")
+	// data, err := os.ReadFile("2021/day14/day14_ex1.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
