@@ -1,0 +1,14 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "day11_lib",
+    srcs = ["day11.go"],
+    importpath = "github.com/clashthebunny/advent-of-code-golang/2021/day11",
+    visibility = ["//visibility:private"],
+)
+
+go_binary(
+    name = "day11",
+    embed = [":day11_lib"],
+    visibility = ["//visibility:public"],
+)

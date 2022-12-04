@@ -108,7 +108,7 @@ func createMapPart2(data []byte) (*dijkstra.Graph, int, int, int) {
 
 func main() {
 	// data, err := os.ReadFile("day15_ex1.txt")
-	data, err := os.ReadFile("day15.txt")
+	data, err := os.ReadFile("2021/day15/day15.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
