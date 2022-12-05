@@ -7,8 +7,7 @@ go_library(
     importpath = "github.com/clashthebunny/advent-of-code-golang/2021/day15",
     visibility = ["//visibility:private"],
     deps = [
-      "@com_github_ryancarrier_dijkstra//:dijkstra",
-      # "gazelle-update-repos",
+        "@com_github_ryancarrier_dijkstra//:dijkstra",
     ],
 )
 
@@ -17,4 +16,3 @@ go_binary(
     embed = [":day15_lib"],
     visibility = ["//visibility:public"],
 )
-
