@@ -17,6 +17,14 @@ Add a new day's BUILD.bazel (after you touch `${YEAR}/day${DAY}/day${DAY}.go`:
 bazel run //:gazelle
 ```
 
+and then be sure to add:
+```
+    data = [
+        "dayX.txt",
+        "dayX_ex.txt",
+    ],
+```
+
 Fetch dependencies:
 
 ```
