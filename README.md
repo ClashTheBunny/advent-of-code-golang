@@ -7,11 +7,10 @@ export DAY=3
 go install github.com/GreenLightning/advent-of-code-downloader/aocdl@latest
 export PATH=~/go/bin/:$PATH
 export YEAR=2022
-mkdir -p ${YEAR}/day${DAY}
-aocdl -year ${YEAR} -day ${DAY} -output ${YEAR}/day${DAY}/day${DAY}.txt
+export DAY=5; mkdir -p ${YEAR}/day${DAY}; aocdl -year ${YEAR} -day ${DAY} -output ${YEAR}/day${DAY}/day${DAY}.txt; echo "package main" > ${YEAR}/day${DAY}/day${DAY}.go
 ```
 
-Add a new day's BUILD.bazel (after you touch `${YEAR}/day${DAY}/day${DAY}.go`:
+Add a new day's BUILD.bazel (after you add `package main` to `${YEAR}/day${DAY}/day${DAY}.go`:
 
 ```
 bazel run //:gazelle

@@ -1,0 +1,18 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "day5_lib",
+    srcs = ["day5.go"],
+    data = [
+        "day5.txt",
+        "day5_ex.txt",
+    ],
+    importpath = "github.com/clashthebunny/advent-of-code-golang/2022/day5",
+    visibility = ["//visibility:private"],
+)
+
+go_binary(
+    name = "day5",
+    embed = [":day5_lib"],
+    visibility = ["//visibility:public"],
+)
