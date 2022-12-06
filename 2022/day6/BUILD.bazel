@@ -4,8 +4,8 @@ go_library(
     name = "day6_lib",
     srcs = ["day6.go"],
     data = [
-      "day6.txt",
-      "day6_ex.txt",
+        "day6.txt",
+        "day6_ex.txt",
     ],
     importpath = "github.com/clashthebunny/advent-of-code-golang/2022/day6",
     visibility = ["//visibility:private"],
